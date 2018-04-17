@@ -1,12 +1,18 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 0.0.1 - initial
+## version 0.0.2 - source slack functions
 ## requires:
 ## - slack.sh
 ##################################################
-. $( dirname ${0} )/slack.sh &>/dev/null
+. $( dirname ${0} )/slack.sh/functions.sh
 ##################################################
+slack-shed-env() {
+ cat << EOF
+alias shed='bash $( pwd $( dirname ${0} ) )/shed.sh'
+EOF
+}
+#-------------------------------------------------
 slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
   {
     for-each-channel ${date_oldest}
