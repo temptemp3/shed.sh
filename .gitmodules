@@ -1,0 +1,3 @@
+[submodule "slack.sh"]
+	path = slack.sh
+	url = https://github.com/temptemp3/slack.sh.git
