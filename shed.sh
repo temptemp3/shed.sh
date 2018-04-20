@@ -1,9 +1,8 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 0.1.0 - new requirements
-## + date-oldest -> start-date
-## + filter-exclude-list override
+## version 0.1.1 - show stderr
+## + new requirements 180418 
 ## requires:
 ## - slack.sh
 ##################################################
@@ -63,7 +62,7 @@ slack-shed() {
 }
 #-------------------------------------------------
 shed() {
- slack shed ${@} 2>debug
+ slack shed ${@}
 }
 ##################################################
 if [ ! ]
