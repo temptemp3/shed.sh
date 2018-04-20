@@ -1,7 +1,7 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 0.1.1 - show stderr
+## version 0.1.2 - export help
 ## + new requirements 180418 
 ## requires:
 ## - slack.sh
@@ -43,19 +43,7 @@ slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
   } 2>/dev/null
 }
 #-------------------------------------------------
-slack-shed-help() {
- cat << EOF
-slack-shed
-
-SUBCOMMANDS
-
-	start-date	yyyy-mm-dd
-	date-oldest	yyyy-mm-dd
-
-	- get channel histories between now and oldest date
-
-EOF
-}
+. $( dirname ${0} )/help.sh
 #-------------------------------------------------
 slack-shed() { 
  commands
