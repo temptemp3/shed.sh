@@ -9,11 +9,15 @@
 # + new requirements 180418 
 # ++ follow-up: make sure ts is converted to date-time 
 #    format
+# +++ filter
+# ++++ users
+# +++++ reactions: users
+# +++++ replies: users
+# ++++ ts
+# +++++ edited: ts
+# +++++ replies: ts
 #-------------------------------------------------
 for-each-channel() { { local date_oldest ; date_oldest="${1}" ; }
-
- echo in testing 1>&2
- read
 
  ## depreciated may remove later
  #{ local function_name ; function_name="${1}" ; }
