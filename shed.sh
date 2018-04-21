@@ -1,8 +1,10 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 0.1.2 - export help
+## version 0.1.3 - testing
 ## + new requirements 180418 
+## ++ follow-up: make sure ts is converted to date-time 
+##    format
 ## requires:
 ## - slack.sh
 ##################################################
@@ -44,6 +46,8 @@ slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
 }
 #-------------------------------------------------
 . $( dirname ${0} )/help.sh
+#-------------------------------------------------
+. $( dirname ${0} )/testing.sh
 #-------------------------------------------------
 slack-shed() { 
  commands
