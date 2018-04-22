@@ -1,20 +1,12 @@
 #!/bin/bash
 ## testing
-## version 0.0.1 - initial
+## version 0.0.2 - channel filter
 ## + new requirements 180418 
-## ++ addition: convert user ids and channel ids in 
-##    text field to real values not ids
-## +++ channel ids not yet implemented
-## ++ follow-up: make sure ts is converted to date-time 
-##    format
-## +++ filter
-## ++++ users 
-## +++++ reactions: users 
-## +++++ replies: users
-## +++++ in text
-## ++++ ts 
-## +++++ edited: ts
-## +++++ replies: ts
+## ++ new feature: channel filter
+## +++ if user specifies channel, limits results to
+##     channel
+## +++ else get history for all channels
+## ++ addition: sub command for user channel history
 #-------------------------------------------------
 shopt -s expand_aliases # aliases
 #-------------------------------------------------
