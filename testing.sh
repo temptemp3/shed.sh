@@ -1,25 +1,20 @@
 #!/bin/bash
 ## testing
 ## version 0.0.1 - initial
-##################################################
-# for-each-channel =slack.sh/functions.sh=
-# - do something on each channel
-# + currently fectching user channel history
-# version 0.0.3 - filter user ids and ts output
-# + new requirements 180418 
-# ++ addition: convert user ids and channel ids in 
-#    text field to real values not ids
-# +++ channel ids not yet implemented
-# ++ follow-up: make sure ts is converted to date-time 
-#    format
-# +++ filter
-# ++++ users 
-# +++++ reactions: users 
-# +++++ replies: users
-# +++++ in text
-# ++++ ts 
-# +++++ edited: ts
-# +++++ replies: ts
+## + new requirements 180418 
+## ++ addition: convert user ids and channel ids in 
+##    text field to real values not ids
+## +++ channel ids not yet implemented
+## ++ follow-up: make sure ts is converted to date-time 
+##    format
+## +++ filter
+## ++++ users 
+## +++++ reactions: users 
+## +++++ replies: users
+## +++++ in text
+## ++++ ts 
+## +++++ edited: ts
+## +++++ replies: ts
 #-------------------------------------------------
 shopt -s expand_aliases # aliases
 #-------------------------------------------------
@@ -337,6 +332,10 @@ for-each-channel-convert() {
  ${FUNCNAME}-tss
 }
 #-------------------------------------------------
+# for-each-channel
+# - do something on each channel
+# + currently fectching user channel history
+# version 0.0.4 - convert user ids and tss
 for-each-channel() { { local date_oldest ; date_oldest="${1}" ; }
 
  ## depreciated may remove later
