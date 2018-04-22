@@ -1,7 +1,7 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 0.1.3 - testing
+## version 0.1.3 - less verbose date-oldest test
 ## + new requirements 180418 
 ## ++ follow-up: make sure ts is converted to date-time 
 ##    format
@@ -29,7 +29,7 @@ slack-shed-start-date() {
 #-------------------------------------------------
 slack-shed-date-oldest-test() {
  test "${date_oldest}"  &&
- date --date="${date_oldest}" &&
+ date --date="${date_oldest}" &>/dev/null &&
  true
 }
 #-------------------------------------------------
