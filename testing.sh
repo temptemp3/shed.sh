@@ -1,17 +1,64 @@
 #!/bin/bash
 ## testing
-## version 0.0.2 - channel filter
+## version 0.1.0 - verbose initial
 ## + new requirements 180418 
-## ++ new feature: channel filter
-## +++ if user specifies channel, limits results to
-##     channel
-## +++ else get history for all channels
-## ++ addition: sub command for user channel history
+## ++ new feature: verbose option 
+## +++ -v (verbose) => set output verbose
+## ++++ option to return json
+## ++++ by default, return csv
+## "channel", "username", "date-time", "text" 
 #-------------------------------------------------
-shopt -s expand_aliases # aliases
+## aliases
+shopt -s expand_aliases # alias expansion
+## sed
+alias sed-strip-double-quotes='sed -e "s/\"//g"'
 #-------------------------------------------------
 declare -f cache &>/dev/null || { # caching
  . $( find $( dirname ${0} ) -name cache.sh ) 
+}
+#-------------------------------------------------
+alias slack-shed-set-output-format='
+ echo ${output_format} > set-output
+'
+#-------------------------------------------------
+slack-shed-set-output-text() { 
+  {
+    local output_format
+    output_format="text"
+  }
+  slack-shed-set-output-format
+}
+#-------------------------------------------------
+slack-shed-set-output-json() { 
+  {
+    local output_format
+    output_format="text"
+  }
+  slack-shed-set-output-format
+}
+#-------------------------------------------------
+slack-shed-set-output-clear() { 
+ slack-shed-set-output-reset
+}
+#-------------------------------------------------
+slack-shed-set-output-reset() { 
+ test ! -f "set-output" || {
+  rm set-output
+ }
+}
+#-------------------------------------------------
+slack-shed-set-output() { 
+ commands
+ test -f "set-output" && {
+  cat set-output
+ true
+ } || {
+  commands
+ }
+}
+#-------------------------------------------------
+slack-shed-set() {
+ commands
 }
 #-------------------------------------------------
 strip-double-quotes() {
@@ -33,8 +80,11 @@ slack-shed-date-oldest-test() {
  true
 }
 #-------------------------------------------------
-# ! not modified
-slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
+# slack-shed-date-oldest
+# - returns message since date specified
+# version 0.0.2 - for-each-channel inheriting context
+#-------------------------------------------------
+slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; local channel_ids ; channel_ids=${@:2} ; { test "${channel_ids}" || { channel_ids="all" ; } ; } ; }
   {
     ${FUNCNAME}-test || { 
       slack-shed-help 
@@ -42,7 +92,7 @@ slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
     }
   }
   {
-    for-each-channel ${date_oldest}
+    for-each-channel #${date_oldest}
   } #2>/dev/null
 }
 #-------------------------------------------------
@@ -85,12 +135,24 @@ slack-users-info() { { local user ; user="${1}" ; local field ; field="${2}" ; }
   }
 }
 #-------------------------------------------------
+for-each-channel-get-user-channel-history-payload-channels() {
+ test "${channel_ids}" = "all" && {
+  get-channel-ids | sed-strip-double-quotes
+ true 
+ } || {
+  echo ${channel_ids}
+ }
+}
+#-------------------------------------------------
 for-each-channel-get-user-channel-history-payload() { 
  cat << EOF
 [
 EOF
  local channel
- for channel in $( get-channel-ids | sed -e 's/"//g' )
+ local channels
+ channels=$( ${FUNCNAME}-channels )
+ echo "channels: ${channels}" 1>&2
+ for channel in ${channels}
  do
   slack-channels-history ${date_oldest} 1>/dev/null
   local member_id
@@ -122,8 +184,8 @@ EOF
 # + caching 
 for-each-channel-get-user-channel-history() {
   {
-    cache \
-    "${cache}/${FUNCNAME}" \
+    #cache \
+    #"${cache}/${FUNCNAME}" \
     "${FUNCNAME}-payload"
   }
 }
@@ -327,9 +389,15 @@ for-each-channel-convert() {
 # for-each-channel
 # - do something on each channel
 # + currently fectching user channel history
-# version 0.0.4 - convert user ids and tss
-for-each-channel() { { local date_oldest ; date_oldest="${1}" ; }
+# version 0.0.5 - inherit channel ids
+for-each-channel() { #{ local date_oldest ; date_oldest="${1}" ; local channel_ids ; channel_ids=${@:2} ; { test "${channel_ids}" || { channel_ids="all" ; } ; } ; }
 
+ #{ # debug
+ # echo ${FUNCNAME}
+ # echo date_oldest: ${date_oldest}
+ # echo channel_ids: ${channel_ids}
+ #}
+       
  ## depreciated may remove later
  #{ local function_name ; function_name="${1}" ; }
  
