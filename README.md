@@ -56,7 +56,9 @@ Settup environment in `slack-config.sh` such as
   local member_ids  
   slack_api_token="SLACK_API_LEGACY_TOKEN_FOR_TARGET_WORSPACE"  
   channel=  
-  member_ids="\"DUMMYID1\" \"DUMMYID2\" \"DUMMYID3\""  
+  member_ids="\"DUMMYID1\" \"DUMMYID2\" \"DUMMYID3\""
+  debug="false" # (optional) true|false
+  output_format="text" # (optional) text|json
 }  
 ```
 
