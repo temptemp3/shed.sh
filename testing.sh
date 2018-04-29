@@ -1,6 +1,6 @@
 #!/bin/bash
 ## testing
-## version 0.1.0 - verbose initial
+## version 0.1.1 - verbose working
 ## + new requirements 180418 
 ## ++ new feature: verbose option 
 ## +++ -v (verbose) => set output verbose
@@ -13,8 +13,16 @@ shopt -s expand_aliases # alias expansion
 ## sed
 alias sed-strip-double-quotes='sed -e "s/\"//g"'
 #-------------------------------------------------
-declare -f cache &>/dev/null || { # caching
+# import
+# - cache
+declare -f cache &>/dev/null || { 
  . $( find $( dirname ${0} ) -name cache.sh ) 
+}
+# - cecho
+declare -f cecho &>/dev/null || { 
+  {
+    . $( find $( dirname ${0} ) -name cecho.sh ) 
+  } &>/dev/null
 }
 #-------------------------------------------------
 alias slack-shed-set-output-format='
@@ -32,7 +40,7 @@ slack-shed-set-output-text() {
 slack-shed-set-output-json() { 
   {
     local output_format
-    output_format="text"
+    output_format="json"
   }
   slack-shed-set-output-format
 }
@@ -57,6 +65,36 @@ slack-shed-set-output() {
  }
 }
 #-------------------------------------------------
+alias slack-shed-debug-setter='
+ echo ${debug} > set-debug
+'
+#-------------------------------------------------
+slack-shed-set-debug-false() {
+  {
+    local debug
+    debug="false"
+  }
+  slack-shed-debug-setter
+}
+#-------------------------------------------------
+slack-shed-set-debug-true() {
+  {
+    local debug
+    debug="true"
+  }
+  slack-shed-debug-setter
+}
+#-------------------------------------------------
+slack-shed-set-debug() {
+ commands
+ test -f "set-debug" && {
+  cat set-debug
+ true
+ } || {
+  commands
+ }
+}
+#-------------------------------------------------
 slack-shed-set() {
  commands
 }
@@ -68,13 +106,11 @@ strip-double-quotes() {
   }
 }
 #-------------------------------------------------
-# ! not modified
 slack-shed-start-date() { 
  slack-shed-date-oldest ${@}
 }
 #-------------------------------------------------
-# ! not modified
-slack-shed-date-oldest-test() {
+slack-shed-date-oldest-test() { 
  test "${date_oldest}"  &&
  date --date="${date_oldest}" &>/dev/null &&
  true
@@ -96,7 +132,6 @@ slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; local chan
   } #2>/dev/null
 }
 #-------------------------------------------------
-# ! not modified
 slack-users-info-case() { 
   case ${field} in 
    ts) {
@@ -129,65 +164,169 @@ slack-users-info() { { local user ; user="${1}" ; local field ; field="${2}" ; }
   )
 
   {
-    cache \
-    "${cache}/${FUNCNAME}-${user}-${field}" \
+    #cache \
+    #"${cache}/${FUNCNAME}-${user}-${field}" \
     "${FUNCNAME}-case"
   }
 }
 #-------------------------------------------------
-for-each-channel-get-user-channel-history-payload-channels() {
- test "${channel_ids}" = "all" && {
-  get-channel-ids | sed-strip-double-quotes
- true 
- } || {
-  echo ${channel_ids}
- }
+slack-shed-test-list-channels() {
+ list-channels ${@}
 }
 #-------------------------------------------------
+list-channels() { { local output ; output=${1-csv} ; }
+ case ${output} in
+  json) {
+   get-channels
+  } ;;
+  csv) {
+   get-channels-csv
+  } ;;
+  text) {
+   true # not yet implemented
+  } ;;
+  text-names|names) {
+   get-channel-names
+  } ;;
+  text-ids|ids) {
+   get-channel-ids
+  } ;;
+  *) {
+   error "unsupported output '${output}'" "" ""
+   false
+  } ;;
+ esac
+}
+#-------------------------------------------------
+slack-shed-test-get-channel-ids() {
+ get-channel-ids | sed-strip-double-quotes
+}
+#-------------------------------------------------
+slack-shed-test() {
+ commands
+}
+#-------------------------------------------------
+for-each-channel-get-user-channel-history-payload-channels() {
+ test ! "${channel_ids}" = "all" || {
+  get-channel-ids | sed-strip-double-quotes
+ }
+ cecho yellow channel_ids: ${channel_ids}
+}
+#-------------------------------------------------
+get-user-channels-history() { { local candidate_id ; candidate_id="${1}" ; }
+  test "${candidate_id}" || {
+   error "empty member id" "${funcname}" "${lineno}"
+   false
+  }
+  { 
+    local api_method
+    api_method="channels.history"
+    local query
+    query="
+.messages[]|
+if .user == ${candidate_id} 
+then 
+(
+  . + {\"channel\":\"${channel}\"}
+)
+else 
+empty
+end
+"
+  }
+  slack-api-query
+}
+## testing
+#echo testing get-user-channels-history ... 1>&2
+#set -v -x
+#channel="channel"
+#get-user-channels-history "U8D6NBMGT"
+#cat temp-get-user-channels-history
+#exit
+alias setup-user-channel-history='
+{
+  local user_channel_history
+  user_channel_history=$( 
+    get-user-channels-history ${member_id} 
+  )
+}
+'
+slack-channels-history-empty-query() { 
+  {
+    cat temp-slack-channels-history \
+    | jq '.messages|length'
+  }
+}
+slack-channels-history-empty() { 
+ 
+ test ! $( ${FUNCNAME}-query ) -eq 0
+}
+alias for-each-channel-get-user-channel-history-payload-on-empty-channel=' 
+{ 
+  slack-channels-history-empty || {
+    {
+      cecho white empty channel history 
+      cecho white next
+    } 1>&2
+    continue
+  }
+}
+'
+alias for-each-channel-get-user-channel-history-payload-on-empty-user-channel='
+{
+  test "${user_channel_history}" || {
+    {
+      cecho white empty user channel history 
+      cecho white next
+    } 1>&2
+    continue
+  }
+}
+'
 for-each-channel-get-user-channel-history-payload() { 
- cat << EOF
-[
-EOF
+
  local channel
- local channels
- channels=$( ${FUNCNAME}-channels )
- echo "channels: ${channels}" 1>&2
- for channel in ${channels}
+ for channel in $( ${FUNCNAME}-channels )
  do
-  slack-channels-history ${date_oldest} 1>/dev/null
+
+  cecho yellow channel: ${channel} 1>&2 
+
+  { # initialize channel history
+    slack-channels-history ${date_oldest} # > temp-slack-channels-history
+  } 1>/dev/null
+
+  for-each-channel-get-user-channel-history-payload-on-empty-channel # continue on empty channel history
+
+  ## test has more true case 
+ 
   local member_id
   for member_id in ${member_ids}
   do
-   setup-user-channel-history
-   test ! "${user_channel_history}" || {
-    ## replace with user channel history function name later
-    {
-      echo ${user_channel_history} \
-      | jq '
-if .["type"] == "message" and .["subtype"]|not
-then
-.
-else
- empty
-end
-'
-    }
-   }
+
+   cecho yellow member_id: ${member_id} 1>&2
+
+   setup-user-channel-history # ${user_channel_history} > temp-get-user-channels-history
+   
+   for-each-channel-get-user-channel-history-payload-on-empty-user-channel # continue on empty user channel history
+
+   echo ${user_channel_history} | jq '.' 
+
   done
- done | sed -e 's/^[}]$/},/'
- cat << EOF
-{}
-]
-EOF
+
+ done 
+
 }
 #-------------------------------------------------
 # + caching 
 for-each-channel-get-user-channel-history() {
+  cecho green [ begin ${FUNCNAME}
   {
     #cache \
     #"${cache}/${FUNCNAME}" \
     "${FUNCNAME}-payload"
   }
+
+  cecho green end of ${FUNCNAME} ]
 }
 #-------------------------------------------------
 # ! only retrieves top level user field
@@ -241,18 +380,7 @@ alias setup-user-real-name='
 '
 alias setup-ts-date='
 {
-
   ts_date=$( date --date="@$( trim ${ts} )" )
-}
-'
-alias setup-global-user-channel-history='
-{
-  local user_channel_history 
-  user_channel_history=$( 
-   ${FUNCNAME}-get-user-channel-history \
-   | tee temp-user-channel-history \
-   | tee temp-user-channel-history-transformed 
-  )
 }
 '
 #-------------------------------------------------
@@ -315,7 +443,7 @@ for-each-channel-convert-tss() {
   ## debug ts to ts_date conversion
   #set -v -x 
   #{
-    sed -i -e "s/${ts}/\"${ts_date}\"/g" temp-user-channel-history-transformed
+    sed -i -e "s/${ts}/\"${ts_date}\"/g" temp-user-channel-history-copy
   #} 2>&1
   #set +v +x
   #-----------------------------------------------
@@ -325,7 +453,7 @@ for-each-channel-convert-tss() {
 
  #------------------------------------------------
  #{ # debug post ts replacement
- #  cat temp-user-channel-history-transformed | jq '.'
+ #  cat temp-user-channel-history-copy | jq '.'
  #}
  #------------------------------------------------
 
@@ -360,20 +488,20 @@ for-each-channel-convert-user-ids() {
   #  echo ${user_real_name} 
   #} 
 
-  sed -i -e "s/${user}/${user_real_name}/g" temp-user-channel-history-transformed
+  sed -i -e "s/${user}/${user_real_name}/g" temp-user-channel-history-copy
 
   ##----------------------------------------------
   ## debug text user id to real name conversion
   #set -v -x
   #{
-    sed -i -e "s/<@$( strip-double-quotes ${user} )>/$( strip-double-quotes ${user_real_name} )/g" temp-user-channel-history-transformed
+    sed -i -e "s/<@$( strip-double-quotes ${user} )>/$( strip-double-quotes ${user_real_name} )/g" temp-user-channel-history-copy
   #} 2>&1
   #set +v +x
   ##----------------------------------------------
 
  done
  #{ # debug post user id replacement
- #  cat temp-user-channel-history-transformed | jq '.'
+ #  cat temp-user-channel-history-copy | jq '.'
  #}
  #------------------------------------------------
  # end replacing user ids
@@ -386,28 +514,56 @@ for-each-channel-convert() {
  ${FUNCNAME}-tss
 }
 #-------------------------------------------------
+alias setup-global-user-channel-history='
+{
+  local user_channel_history 
+  user_channel_history=$( 
+   for-each-channel-get-user-channel-history \
+   | tee temp-user-channel-history
+  )
+}
+'
+#-------------------------------------------------
+for-each-channel-output-json() { 
+ cat temp-user-channel-history-copy \
+ | jq '.[]'
+}
+#-------------------------------------------------
+for-each-channel-output-text() { 
+ cat temp-user-channel-history-copy \
+ | jq '
+ .[]|[.["channel"],.["user"],.["ts"],.["text"]]|join(",")
+'
+}
+#-------------------------------------------------
+for-each-channel-output() { 
+ commands
+}
+#-------------------------------------------------
 # for-each-channel
 # - do something on each channel
 # + currently fectching user channel history
 # version 0.0.5 - inherit channel ids
+#-------------------------------------------------
 for-each-channel() { #{ local date_oldest ; date_oldest="${1}" ; local channel_ids ; channel_ids=${@:2} ; { test "${channel_ids}" || { channel_ids="all" ; } ; } ; }
 
- #{ # debug
- # echo ${FUNCNAME}
- # echo date_oldest: ${date_oldest}
- # echo channel_ids: ${channel_ids}
- #}
+ { # debug
+  cecho green in ${FUNCNAME}
+  cecho yellow date_oldest: ${date_oldest}
+  cecho yellow channel_ids: ${channel_ids}
+ } 
        
- ## depreciated may remove later
- #{ local function_name ; function_name="${1}" ; }
- 
- setup-global-user-channel-history
+ setup-global-user-channel-history # ${user_channel_history} > temp-user-channel-history
 
+ # test empty user channel history
+
+ { # convert messages to array
+   sed -e 's/^}/},/' -e '$s/.*/}]/' -e '1s/.*/[{/' temp-user-channel-history  
+ } > temp-user-channel-history-copy
+ 
  ${FUNCNAME}-convert # (user ids, tss)
 
- ## expect
- cat temp-user-channel-history-transformed | jq '.'
- # > temp-user-channel-history-transformed
+ ${FUNCNAME}-output ${output_format}
 
 }
 #-------------------------------------------------

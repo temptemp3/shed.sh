@@ -1,10 +1,7 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 0.1.3 - less verbose date-oldest test
-## + new requirements 180418 
-## ++ follow-up: make sure ts is converted to date-time 
-##    format
+## version 0.1.4 - cecho override 
 ## requires:
 ## - slack.sh
 ##################################################
@@ -42,7 +39,7 @@ slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
   }
   {
     for-each-channel ${date_oldest}
-  } 2>/dev/null
+  } 
 }
 #-------------------------------------------------
 . $( dirname ${0} )/help.sh
@@ -50,6 +47,12 @@ slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
 . $( dirname ${0} )/testing.sh
 #-------------------------------------------------
 slack-shed() { 
+ # - cecho
+ test ! "${debug}" = "false" || {
+  cecho() {
+   true
+  }
+ }
  commands
 }
 #-------------------------------------------------
