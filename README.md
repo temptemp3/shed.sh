@@ -37,8 +37,6 @@ help
 
 Export channel history since 8 Apr 2018
 
-`shed start-date 2018-04-08` 
-
 `shed date-oldest 2018-04-08` 
 
 Get help
