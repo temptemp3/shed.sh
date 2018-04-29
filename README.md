@@ -37,6 +37,8 @@ help
 
 Export channel history since 8 Apr 2018
 
+`shed start-date 2018-04-08` 
+
 `shed date-oldest 2018-04-08` 
 
 Get help
@@ -45,9 +47,13 @@ Get help
 
 ## INSTALLATION
 
-Add alias `shed` such as `alias shed='bash /path/to/shed.sh/shed.sh'`  *optional*
+Install `shed` command using the following command
 
-Settup environment in `slack-config.sh` such as
+```
+$ eval $( bash /path/to/shed.sh/shed.sh env )
+```
+
+Setup environment in `slack-config.sh` such as
 
 ```
 {   
