@@ -1,6 +1,98 @@
 #!/bin/bash
 ## testing
-## version 0.2.0 - username to userid initial
+## version 0.3.0 - get-user-channel-history initial
+##################################################
+## objective:
+## + implement
+## ++ get-user-channel-history
+## +++ taking arguments
+## ++++ 1) start-date
+## ++++ 2) user_id (member_id)
+## ++++ 3-optional) channel_ids..
+## ++ get-user-channel-history-for-today
+## +++ taking arguments
+## ++++ 1) user_id
+## ++++ 2-optional) channel_ids..
+##################################################
+date-today() {
+ date +%Y-%m-%d
+}
+#-------------------------------------------------
+alias test-member-id='
+{
+ test "${member_id}" || {
+  {
+    echo 
+    echo member id not specified
+    echo 
+    ${FUNCNAME}-help
+  } 1>&2
+  error "false" # hide error
+  false
+ }
+}
+'
+#-------------------------------------------------
+slack-shed-get-user-channel-history-for-today-help() {
+ cat << EOF
+shed get user-channel-history-for-today
+
+- return channel history for a single user since beginning of day for one or more channels
+
+shed-get-user-channel-history member_id [channel_ids..]
+
+REQUIRED
+
+1  - member id (U1234567890)
+
+OPTIONAL
+
+2- - channel ids (C123456779889 C..)
+EOF
+}
+#-------------------------------------------------
+slack-shed-get-user-channel-history-for-today() { { local member_id ; member_id="${1}" ; local channel_ids ; channel_ids=${@:2} ; }
+  test-member-id
+  { 
+    slack-shed-get-user-channel-history \
+    $( date-today ) \
+    ${member_id} \
+    ${channel_ids}
+  }
+}
+#-------------------------------------------------
+slack-shed-get-user-channel-history-help() { 
+ cat << EOF
+shed get user-channel-history
+
+- return channel history for a single user since start date for one or more channels
+
+shed-get-user-channel-history start_date member_id [channel_ids..]
+
+REQUIRED
+
+1  - start date (yyyy-mm-dd)
+
+2  - member id (U1234567890)
+
+OPTIONAL
+
+3- - channel ids (C123456779889 C..)
+EOF
+}
+#-------------------------------------------------
+slack-shed-get-user-channel-history() { { local date_oldest ; date_oldest="${1}" ; local member_id ; member_id="${2}" ; local channel_ids ; channel_ids=${@:3} ; }
+ test-member-id
+ {
+   local member_ids
+   member_ids="\"${member_id}\""
+ }
+ slack-shed-date-oldest ${date_oldest} ${channel_ids}
+}
+#-------------------------------------------------
+slack-shed-get() {
+ commands
+}
 ##################################################
 ## objective:
 ## + map username to user id
@@ -246,9 +338,12 @@ slack-shed-test() {
  commands
 }
 #-------------------------------------------------
+# version 0.0.2 - set channel_ids if all
 for-each-channel-get-user-channel-history-payload-channels() {
  test ! "${channel_ids}" = "all" || {
-  get-channel-ids | sed-strip-double-quotes
+  channel_ids=$( 
+   get-channel-ids | sed-strip-double-quotes
+  )
  }
  cecho yellow channel_ids: ${channel_ids}
 }
@@ -323,10 +418,14 @@ alias for-each-channel-get-user-channel-history-payload-on-empty-user-channel='
   }
 }
 '
+#-------------------------------------------------
+# version 0.0.2 - using channel_ids
 for-each-channel-get-user-channel-history-payload() { 
 
+ ${FUNCNAME}-channels # ${channel_ids}
+
  local channel
- for channel in $( ${FUNCNAME}-channels )
+ for channel in ${channel_ids}
  do
 
   cecho yellow channel: ${channel} 1>&2 
@@ -338,6 +437,8 @@ for-each-channel-get-user-channel-history-payload() {
   for-each-channel-get-user-channel-history-payload-on-empty-channel # continue on empty channel history
 
   ## test has more true case 
+
+  cecho yellow member_ids: ${member_ids}
  
   local member_id
   for member_id in ${member_ids}
