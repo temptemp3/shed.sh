@@ -1,6 +1,6 @@
 #!/bin/bash
 ## testing
-## version 0.3.0 - get-user-channel-history initial
+## version 0.3.1 - Fix date format
 ##################################################
 ## objective:
 ## + implement
