@@ -1,3 +1,7 @@
 [submodule "slack.sh"]
 	path = src/slack.sh
 	url = https://github.com/temptemp3/slack.sh.git
+[submodule "docs"]
+	path = docs
+	url = https://github.com/temptemp3/shed-docs2.git
+	branch = html
