@@ -14,8 +14,23 @@
 ## ++++ 1) user_id
 ## ++++ 2-optional) channel_ids..
 ##################################################
+shopt -s expand_aliases
+alias sed-escape-slash='sed -e "s/\([/]\)/\\\\\1/g"'
+escape-slash() {
+  {
+    echo ${@} 
+  } | sed-escape-slash
+}
+slack-shed-test-escape-slash() {
+ escape-slash ${@}
+}
+## testing
+#$ shed test escape-slash 01/17/18 13:03
+#01\/17\/18 13:03
+#-------------------------------------------------
+# version 0.0.2 - using double quotes
 date-today() {
- date +%Y-%m-%d
+ date "+%Y-%m-%d"
 }
 #-------------------------------------------------
 alias test-member-id='
@@ -306,6 +321,7 @@ slack-shed-test-list-channels() {
  list-channels ${@}
 }
 #-------------------------------------------------
+# version 0.0.2 - csv,text synonyms
 list-channels() { { local output ; output=${1-csv} ; }
  case ${output} in
   json) {
@@ -315,7 +331,7 @@ list-channels() { { local output ; output=${1-csv} ; }
    get-channels-csv
   } ;;
   text) {
-   true # not yet implemented
+   get-channels-csv
   } ;;
   text-names|names) {
    get-channel-names
@@ -338,9 +354,10 @@ slack-shed-test() {
  commands
 }
 #-------------------------------------------------
-# version 0.0.2 - set channel_ids if all
+# version 0.0.3 - case all cecho starting
 for-each-channel-get-user-channel-history-payload-channels() {
  test ! "${channel_ids}" = "all" || {
+  cecho green getting all channel ids..
   channel_ids=$( 
    get-channel-ids | sed-strip-double-quotes
   )
@@ -393,7 +410,6 @@ slack-channels-history-empty-query() {
   }
 }
 slack-channels-history-empty() { 
- 
  test ! $( ${FUNCNAME}-query ) -eq 0
 }
 alias for-each-channel-get-user-channel-history-payload-on-empty-channel=' 
@@ -519,11 +535,35 @@ alias setup-user-real-name='
   )
 }
 '
-alias setup-ts-date='
-{
-  ts_date=$( date --date="@$( trim ${ts} )" )
+#-------------------------------------------------
+setup-ts-date-case-default() {
+ echo "+%m/%d/%y %H:%M"
 }
-'
+#-------------------------------------------------
+setup-ts-date-case() {
+ case ${date_output_format} in
+  default|mmddyyhhmm) { 
+   ${FUNCNAME}-default
+  } ;;
+  # other formats
+  *) {
+   ${FUNCNAME}-default
+  } ;;
+ esac
+}
+#-------------------------------------------------
+# version 0.0.2 - setup-ts-date as function
+setup-ts-date() {
+  # debug
+  cecho yellow ts: ${ts}
+  cecho yellow ts_trim: $( trim ${ts} )
+  ts_date=$( 
+   escape-slash $( 
+    date --date="@$( trim ${ts} )" "$( ${FUNCNAME}-case )" 
+   )
+  )
+  cecho yellow ts_date: ${ts_date}
+}
 #-------------------------------------------------
 for-each-channel-convert-tss-get-prior() { 
   cat temp-user-channel-history \
@@ -554,6 +594,7 @@ for-each-channel-convert-tss-get() {
 #for-each-channel-get-tss
 #exit
 #-------------------------------------------------
+# version 0.0.2 - setup-ts-date documentation
 for-each-channel-convert-tss() { 
 
  #------------------------------------------------
@@ -574,11 +615,7 @@ for-each-channel-convert-tss() {
  for ts in ${tss}
  do
 
-  setup-ts-date
-
-  ## debug ts,ts_date
-  #echo ${ts} 1>&2
-  #echo ${ts_date} 1>&2
+  setup-ts-date # ${ts_date} (= 02\/06\/18 02:27)
 
   #-----------------------------------------------
   ## debug ts to ts_date conversion
