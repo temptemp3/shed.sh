@@ -1,6 +1,6 @@
 #!/bin/bash
 ## testing
-## version 0.3.1 - Fix date format
+## version 0.3.2 - Fix channel format initial
 ##################################################
 ## objective:
 ## + implement
@@ -687,7 +687,12 @@ for-each-channel-convert-user-ids() {
 
 }
 #-------------------------------------------------
+for-each-channel-convert-channel-ids() { 
+ true
+}
+#-------------------------------------------------
 for-each-channel-convert() { 
+ ${FUNCNAME}-channel-ids
  ${FUNCNAME}-user-ids
  ${FUNCNAME}-tss
 }
