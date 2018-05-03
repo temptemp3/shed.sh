@@ -1,6 +1,34 @@
 #!/bin/bash
 ## testing
-## version 0.3.1 - Fix date format
+## version 0.3.3 - Fix channel format 
+#-------------------------------------------------
+## aliases
+shopt -s expand_aliases # alias expansion
+## sed
+alias sed-strip-double-quotes='sed -e "s/\"//g"'
+### in slash.sh/functions-api.sh
+get-channel-name() { { local channel_id ; channel_id="${1}" ; }
+  {
+    local api_method
+    api_method="channels.list"
+    local query
+    query="
+.channels[]|
+if .id == \"$( trim ${channel_id} )\"
+then
+.name
+else
+empty
+end
+"
+  }
+  slack-api-query
+}
+## testing
+#set -v -x
+#car() { echo ${1} ; }
+#get-channel-name $( car $( get-channel-ids ) ) # get-channel-name C28094000
+#exit
 ##################################################
 ## objective:
 ## + implement
@@ -154,11 +182,6 @@ slack-shed-test-list-users() {
 ## ++++ option to return json
 ## ++++ by default, return csv
 ## "channel", "username", "date-time", "text" 
-#-------------------------------------------------
-## aliases
-shopt -s expand_aliases # alias expansion
-## sed
-alias sed-strip-double-quotes='sed -e "s/\"//g"'
 #-------------------------------------------------
 # import
 # - cache
@@ -355,7 +378,8 @@ slack-shed-test() {
 }
 #-------------------------------------------------
 # version 0.0.3 - case all cecho starting
-for-each-channel-get-user-channel-history-payload-channels() {
+setup-channel-ids() {
+ cecho green in ${FUNCNAME}
  test ! "${channel_ids}" = "all" || {
   cecho green getting all channel ids..
   channel_ids=$( 
@@ -437,8 +461,6 @@ alias for-each-channel-get-user-channel-history-payload-on-empty-user-channel='
 #-------------------------------------------------
 # version 0.0.2 - using channel_ids
 for-each-channel-get-user-channel-history-payload() { 
-
- ${FUNCNAME}-channels # ${channel_ids}
 
  local channel
  for channel in ${channel_ids}
@@ -687,7 +709,54 @@ for-each-channel-convert-user-ids() {
 
 }
 #-------------------------------------------------
+for-each-channel-convert-channel-ids-get() { 
+  { # get channel ids
+    cat temp-user-channel-history \
+    | jq '.channel' \
+    | sort \
+    | uniq
+  }
+}
+## testing
+#for-each-channel-convert-channel-ids-get
+#exit
+#-------------------------------------------------
+for-each-channel-convert-channel-ids-debug() {
+ cecho yellow channel_id: ${channel_id} 
+ cecho yellow channel_name: ${channel_name} 
+}
+#-------------------------------------------------
+for-each-channel-convert-channel-ids-sed() {
+    
+  sed -i -e "s/${channel_id}/$( trim ${channel_name} )/g" temp-user-channel-history-copy
+
+}
+#-------------------------------------------------
+for-each-channel-convert-channel-ids-setup() {
+ channel_name=$(
+  get-channel-name ${channel_id}
+ )
+}
+#-------------------------------------------------
+for-each-channel-convert-channel-ids() {
+ cecho yellow channels_ids: ${channel_ids}
+ local channel_id
+ local channel_name
+ for channel_id in ${channel_ids} #$( ${FUNCNAME}-get )
+ do
+  ${FUNCNAME}-setup
+  ${FUNCNAME}-debug
+  ${FUNCNAME}-sed
+ done
+}
+## testing
+#set -v -x
+#channel_ids=$( get-channel-ids )
+#for-each-channel-convert-channel-ids
+#exit
+#-------------------------------------------------
 for-each-channel-convert() { 
+ ${FUNCNAME}-channel-ids
  ${FUNCNAME}-user-ids
  ${FUNCNAME}-tss
 }
@@ -702,9 +771,16 @@ alias setup-global-user-channel-history='
 }
 '
 #-------------------------------------------------
+# version 0.0.2 - less json on parse error
 for-each-channel-output-json() { 
- cat temp-user-channel-history-copy \
- | jq '.[]'
+ {
+   cat temp-user-channel-history-copy \
+   | jq '.[]' 
+ } || {
+  error "json parse error" "${FUNCNAME}" "${LINENO}"
+  less temp-user-channel-history-copy
+  false
+ }
 }
 #-------------------------------------------------
 for-each-channel-output-text() { 
@@ -730,7 +806,9 @@ for-each-channel() { #{ local date_oldest ; date_oldest="${1}" ; local channel_i
   cecho yellow date_oldest: ${date_oldest}
   cecho yellow channel_ids: ${channel_ids}
  } 
-       
+
+ setup-channel-ids # ${channel_ids}
+
  setup-global-user-channel-history # ${user_channel_history} > temp-user-channel-history
 
  # test empty user channel history
