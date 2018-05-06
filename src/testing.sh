@@ -1,7 +1,7 @@
 #!/bin/bash
 ## testing
-## version 0.4.0 - handle missing config
-#-------------------------------------------------
+## version 0.4.1 - temp in cache
+##################################################
 # version 0.0.2 - handdle missing config
 slack-initialize-config() {
  test -f "$( dirname ${0} )/slack-config.sh" || {
@@ -438,7 +438,7 @@ alias setup-user-channel-history='
 '
 slack-channels-history-empty-query() { 
   {
-    cat temp-slack-channels-history \
+    cat ${cache}/temp-slack-channels-history \
     | jq '.messages|length'
   }
 }
@@ -520,13 +520,13 @@ for-each-channel-get-user-channel-history() {
 # ! only retrieves top level user field
 for-each-channel-convert-user-ids-get-unique-user-ids-prior() {
   {
-    jq '.[]["user"]' temp-user-channel-history 
+    jq '.[]["user"]' ${cache}/temp-user-channel-history 
   }
 }
 #-------------------------------------------------
 for-each-channel-convert-user-ids-get-unique-user-ids-using-grep() {
   {
-    grep -e '\"U[^"]*.' --only-matching temp-user-channel-history
+    grep -e '\"U[^"]*.' --only-matching ${cache}/temp-user-channel-history
   }
 }
 #-------------------------------------------------
@@ -597,7 +597,7 @@ setup-ts-date() {
 }
 #-------------------------------------------------
 for-each-channel-convert-tss-get-prior() { 
-  cat temp-user-channel-history \
+  cat ${cache}/temp-user-channel-history \
   | jq '.[]["ts"]' \
   | sort \
   | uniq \
@@ -606,7 +606,7 @@ for-each-channel-convert-tss-get-prior() {
 #-------------------------------------------------
 for-each-channel-convert-tss-get-using-grep() { 
   {
-    cat temp-user-channel-history \
+    cat ${cache}/temp-user-channel-history \
 	    | grep -e '"ts":\s"[^"]*.' --only-matching || true
   } \
   | cut '-f2' '-d:'
@@ -652,7 +652,7 @@ for-each-channel-convert-tss() {
   ## debug ts to ts_date conversion
   #set -v -x 
   #{
-    sed -i -e "s/${ts}/\"${ts_date}\"/g" temp-user-channel-history-copy
+    sed -i -e "s/${ts}/\"${ts_date}\"/g" ${cache}/temp-user-channel-history-copy
   #} 2>&1
   #set +v +x
   #-----------------------------------------------
@@ -697,13 +697,13 @@ for-each-channel-convert-user-ids() {
   #  echo ${user_real_name} 
   #} 
 
-  sed -i -e "s/${user}/${user_real_name}/g" temp-user-channel-history-copy
+  sed -i -e "s/${user}/${user_real_name}/g" ${cache}/temp-user-channel-history-copy
 
   ##----------------------------------------------
   ## debug text user id to real name conversion
   #set -v -x
   #{
-    sed -i -e "s/<@$( strip-double-quotes ${user} )>/$( strip-double-quotes ${user_real_name} )/g" temp-user-channel-history-copy
+    sed -i -e "s/<@$( strip-double-quotes ${user} )>/$( strip-double-quotes ${user_real_name} )/g" ${cache}/temp-user-channel-history-copy
   #} 2>&1
   #set +v +x
   ##----------------------------------------------
@@ -720,7 +720,7 @@ for-each-channel-convert-user-ids() {
 #-------------------------------------------------
 for-each-channel-convert-channel-ids-get() { 
   { # get channel ids
-    cat temp-user-channel-history \
+    cat ${cache}/temp-user-channel-history \
     | jq '.channel' \
     | sort \
     | uniq
@@ -737,7 +737,7 @@ for-each-channel-convert-channel-ids-debug() {
 #-------------------------------------------------
 for-each-channel-convert-channel-ids-sed() {
     
-  sed -i -e "s/${channel_id}/$( trim ${channel_name} )/g" temp-user-channel-history-copy
+  sed -i -e "s/${channel_id}/$( trim ${channel_name} )/g" ${cache}/temp-user-channel-history-copy
 
 }
 #-------------------------------------------------
@@ -775,7 +775,7 @@ alias setup-global-user-channel-history='
   local user_channel_history 
   user_channel_history=$( 
    for-each-channel-get-user-channel-history \
-   | tee temp-user-channel-history
+   | tee ${cache}/temp-user-channel-history
   )
 }
 '
@@ -783,17 +783,17 @@ alias setup-global-user-channel-history='
 # version 0.0.2 - less json on parse error
 for-each-channel-output-json() { 
  {
-   cat temp-user-channel-history-copy \
+   cat ${cache}/temp-user-channel-history-copy \
    | jq '.[]' 
  } || {
   error "json parse error" "${FUNCNAME}" "${LINENO}"
-  less temp-user-channel-history-copy
+  less ${cache}/temp-user-channel-history-copy
   false
  }
 }
 #-------------------------------------------------
 for-each-channel-output-text() { 
- cat temp-user-channel-history-copy \
+ cat ${cache}/temp-user-channel-history-copy \
  | jq '
  .[]|[.["channel"],.["user"],.["ts"],.["text"]]|join(",")
 '
@@ -823,8 +823,8 @@ for-each-channel() { #{ local date_oldest ; date_oldest="${1}" ; local channel_i
  # test empty user channel history
 
  { # convert messages to array
-   sed -e 's/^}/},/' -e '$s/.*/}]/' -e '1s/.*/[{/' temp-user-channel-history  
- } > temp-user-channel-history-copy
+   sed -e 's/^}/},/' -e '$s/.*/}]/' -e '1s/.*/[{/' ${cache}/temp-user-channel-history  
+ } > ${cache}/temp-user-channel-history-copy
  
  ${FUNCNAME}-convert # (user ids, tss)
 
