@@ -1,6 +1,15 @@
 #!/bin/bash
 ## testing
-## version 0.3.3 - Fix channel format 
+## version 0.4.0 - handle missing config
+#-------------------------------------------------
+# version 0.0.2 - handdle missing config
+slack-initialize-config() {
+ test -f "$( dirname ${0} )/slack-config.sh" || {
+  error "missing slack-config.sh" "" ""
+  false
+ }
+ . $( dirname ${0} )/slack-config.sh
+}
 #-------------------------------------------------
 ## aliases
 shopt -s expand_aliases # alias expansion
