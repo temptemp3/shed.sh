@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>index | temptemp3.github.io/shed.sh</title>
+<title>usage | temptemp3.github.io/shed.sh</title>
 
-<link rel="canonical" href="https://temptemp3.github.io/shed.sh/" />
+<link rel="canonical" href="https://temptemp3.github.io/shed.sh/usage.html" />
 <link rel="stylesheet" href="css/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <style>
@@ -35,26 +35,77 @@ body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <div class="w3-col l8 s12">
 <div class="w3-card-4 w3-margin w3-white">
 <div class="w3-container">
-<h1>index</h1>
+<h1>usage</h1>
 
 <!--
-[index](index.html)
+[usage](usage.html)
 -->
 
 <hr />
 
-<p><strong>links</strong></p>
+<p><code>shed</code> command - display available commands</p>
 
-<ul>
-<li><a href="getting-started.html">getting started</a></li>
-<li><a href="usage.html">usage</a></li>
-</ul>
+<hr />
 
-<p><strong>log</strong></p>
+<p><code>shed help</code> command - show command documentation</p>
 
-<ul>
-<li>create docs <!-- 2018/05/06 --></li>
-</ul>
+<hr />
+
+<p><code>shed env</code> command - output command for environment</p>
+
+<p>usage</p>
+
+<p><code>
+eval $( bash /path/to/shed.sh env )
+</code></p>
+
+<p>see also usage in <a href="getting-started.html">getting started</a></p>
+
+<hr />
+
+<p><code>shed start-date</code> command - output channel history since start date</p>
+
+<p>usage</p>
+
+<p><code>
+shed start-date 2018-01-01
+</code></p>
+
+<hr />
+
+<p><code>shed getuser-channel-history</code> command - output channel history since start date for a specific user in given channels or all</p>
+
+<p>usage</p>
+
+<p>ouput channel history of user (U00000000) in channels (C00000000 C11111111)</p>
+
+<p><code>
+shed get user-channel-history U00000000 C00000000 C11111111
+</code></p>
+
+<hr />
+
+<p><code>shed set</code> command - set specified command runtime behavior</p>
+
+<p>usage</p>
+
+<p>set output format to text</p>
+
+<p><code>
+shed set ouput text
+</code></p>
+
+<p>enable debug mode</p>
+
+<p><code>
+shed set debug true
+</code></p>
+
+<p>disable debug mode</p>
+
+<p><code>
+shed set debug false
+</code></p>
 
 <hr />
 <!--.w3-container--></div>
