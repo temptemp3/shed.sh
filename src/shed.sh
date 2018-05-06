@@ -1,12 +1,16 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 0.1.4 - cecho override 
+## version 1.0.0 - post testing integration
 ## requires:
 ## - slack.sh
 ##################################################
+. $( dirname ${0} )/slack.sh/sh2/cache.sh
+. $( dirname ${0} )/slack.sh/sh2/cecho.sh
 . $( dirname ${0} )/slack.sh/functions.sh
+. $( dirname ${0} )/functions.sh
 ##################################################
+## override default behvior in slack
 list-available-commands-filter-exclude-list() { 
  cat << EOF
 $( ${FUNCNAME}-default )
@@ -14,51 +18,11 @@ date-oldest
 EOF
 }
 #-------------------------------------------------
-slack-shed-env() {
- cat << EOF
-alias shed='bash $( pwd $( dirname ${0} ) )/shed.sh'
-EOF
-}
-#-------------------------------------------------
-slack-shed-start-date() { 
- slack-shed-date-oldest ${@}
-}
-#-------------------------------------------------
-slack-shed-date-oldest-test() {
- test "${date_oldest}"  &&
- date --date="${date_oldest}" &>/dev/null &&
- true
-}
-#-------------------------------------------------
-slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; }
-  {
-    ${FUNCNAME}-test || { 
-      slack-shed-help 
-      { error false ; false ; }
-    }
-  }
-  {
-    for-each-channel ${date_oldest}
-  } 
-}
-#-------------------------------------------------
 . $( dirname ${0} )/help.sh
 #-------------------------------------------------
+. $( dirname ${0} )/entry.sh
+#-------------------------------------------------
 . $( dirname ${0} )/testing.sh
-#-------------------------------------------------
-slack-shed() { 
- # - cecho
- test ! "${debug}" = "false" || {
-  cecho() {
-   true
-  }
- }
- commands
-}
-#-------------------------------------------------
-shed() {
- slack shed ${@}
-}
 ##################################################
 if [ ! ]
 then
