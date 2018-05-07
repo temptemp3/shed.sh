@@ -1,14 +1,11 @@
 #!/bin/bash
 ## shed
 ## - export workdspace slack history
-## version 1.0.0 - post testing integration
+## version 1.0.1 - using header
 ## requires:
 ## - slack.sh
 ##################################################
-. $( dirname ${0} )/slack.sh/sh2/cache.sh
-. $( dirname ${0} )/slack.sh/sh2/cecho.sh
-. $( dirname ${0} )/slack.sh/functions.sh
-. $( dirname ${0} )/functions.sh
+. $( dirname ${0} )/header.sh $( dirname ${0} )
 ##################################################
 ## override default behvior in slack
 list-available-commands-filter-exclude-list() { 

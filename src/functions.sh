@@ -1,23 +1,8 @@
 #!/bin/bash
 ## functions
 ## - functions for shed
-## version 0.0.1 - initial
+## version 0.0.2 - export sources, env fix
 ##################################################
-. $( dirname ${0} )/aliases.sh
-. $( dirname ${0} )/functions-test.sh
-. $( dirname ${0} )/functions-set.sh
-. $( dirname ${0} )/functions-get.sh
-##################################################
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
-#--------------------------------------------------
 strip-double-quotes() {
   {
     echo ${@} \
@@ -124,10 +109,11 @@ slack-shed-date-oldest() { { local date_oldest ; date_oldest="${1}" ; local chan
   } #2>/dev/null
 }
 #-------------------------------------------------
+# version 0.0.2 - fix for use out of shed_source dir
 slack-shed-env() {
  cat << EOF
-alias shed='bash $( pwd $( dirname ${0} ) )/shed.sh'
-alias shed-debug='bash -v -x $( pwd $( dirname ${0} ) )/shed.sh'
+alias shed='bash $( dirname ${0} )/shed.sh'
+alias shed-debug='bash -v -x $( dirname ${0} )/shed.sh'
 EOF
 }
 ##################################################
