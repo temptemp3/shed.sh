@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>usage | temptemp3.github.io/shed.sh</title>
+<title>features | temptemp3.github.io/shed.sh</title>
 
-<link rel="canonical" href="https://temptemp3.github.io/shed.sh/usage.html" />
+<link rel="canonical" href="https://temptemp3.github.io/shed.sh/features.html" />
 <link rel="stylesheet" href="css/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <style>
@@ -35,89 +35,54 @@ body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <div class="w3-col l8 s12">
 <div class="w3-card-4 w3-margin w3-white">
 <div class="w3-container">
-<h1>usage</h1>
+<h1>features</h1>
 
 <!--
-[usage](usage.html)
+[features](features.html)
 -->
 
 <hr />
 
-<p><code>shed</code> command - display available commands</p>
-
-<hr />
-
-<p><code>shed help</code> command - show command documentation</p>
-
-<hr />
-
-<p><code>shed env</code> command - output command for environment</p>
-
-<p>usage</p>
-
-<p><code>
-eval $( bash /path/to/shed.sh env )
-</code></p>
-
-<p>see also usage in <a href="getting-started.html">getting started</a></p>
-
-<hr />
-
-<p><code>shed start-date</code> command - output channel history since start date</p>
-
-<p>usage</p>
-
-<p><code>
-shed start-date 2018-01-01
-</code></p>
-
-<hr />
-
-<p><code>shed getuser-channel-history</code> command - output channel history since start date for a specific user in given channels or all</p>
-
-<p>usage</p>
-
-<p>ouput channel history of user (U00000000) in channels (C00000000 C11111111)</p>
-
-<p><code>
-shed get user-channel-history U00000000 C00000000 C11111111
-</code></p>
-
-<hr />
-
-<p><code>shed set</code> command - set specified command runtime behavior</p>
-
-<p>usage</p>
-
-<p>set output format to text</p>
-
-<p><code>
-shed set ouput text
-</code></p>
-
-<p>enable debug mode</p>
-
-<p><code>
-shed set debug true
-</code></p>
-
-<p>disable debug mode</p>
-
-<p><code>
-shed set debug false
-</code></p>
-
-<hr />
-
-<p><span id="mapuserrealnames">map user real names to user IDs / get user id from user real name</span></p>
-
-<p><code>shed get user-id-by real-name</code> command - get user id by real name</p>
-
-<p>usage</p>
-
-<p><code>
-shed get user-id-by real-name 2b1t # U00000000
-</code></p>
+<ul>
+<li>CLI for Slack API
+<ul>
+<li><code>Slack API</code> / <code>slack.sh</code></li>
+</ul></li>
+<li>retrieve
+<ul>
+<li>user channel history
+<ul>
+<li><code>shed</code> / <code>shed start-date</code></li>
+</ul></li>
+<li>user id from real name <a href="usage.html#mapuserrealnames">usage</a>
+<ul>
+<li><code>shed get user-id-by real-name</code></li>
+</ul></li>
+</ul></li>
+<li>human-readable output
+<ul>
+<li>convert
+<ul>
+<li>ts -> date</li>
+<li>user id -> real name</li>
+<li>channel id -> channel name</li>
+</ul></li>
+</ul></li>
+<li>output formats
+<ul>
+<li>json</li>
+<li>text/csv</li>
+</ul></li>
+<li>caching
+<ul>
+<li><code>sh2/cache.sh</code></li>
+</ul></li>
+<li>error handling
+<ul>
+<li><code>sh2/error.sh</code></li>
+</ul></li>
+<li>debug mode</li>
+</ul>
 
 <hr />
 <!--.w3-container--></div>
