@@ -1,6 +1,51 @@
 #!/bin/bash
 ## testing
-## version 0.1.0 - retrieve user id initial
+## version 0.2.0 - allow real names and channels initial
+#################################################
+# issue -16- allow real names and channels
+# <https://github.com/temptemp3/shed.sh/issues/16>
+#-------------------------------------------------
+# in src/aliases.sh
+#-------------------------------------------------
+alias test-member-id='
+{
+ test "${member_id}" || {
+  {
+    echo 
+    echo member id not specified
+    echo 
+    ${FUNCNAME}-help
+  } 1>&2
+  error "false" # hide error
+  false
+ }
+}
+'
+#------------------------------------------------
+# in src/functions-get.sh
+#------------------------------------------------
+slack-shed-get-user-channel-history-for-today() { { local member_id ; member_id="${1}" ; local channel_ids ; channel_ids=${@:2} ; }
+  test-member-id
+  { 
+    slack-shed-get-user-channel-history \
+    $( date-today ) \
+    ${member_id} \
+    ${channel_ids}
+  }
+}
+#-------------------------------------------------
+slack-shed-get-user-channel-history() { { local date_oldest ; date_oldest="${1}" ; local member_id ; member_id="${2}" ; local channel_ids ; channel_ids=${@:3} ; }
+ test-member-id
+ {
+   local member_ids
+   member_ids="\"${member_id}\""
+ }
+ slack-shed-date-oldest ${date_oldest} ${channel_ids}
+}
+#-------------------------------------------------
+slack-shed-get() {
+ commands
+}
 ##################################################
 ## objective:
 ## - retrieve user id from real name etc.
