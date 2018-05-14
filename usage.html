@@ -73,15 +73,33 @@ shed start-date 2018-01-01
 
 <hr />
 
+<p>get channel histories by user</p>
+
 <p><code>shed getuser-channel-history</code> command - output channel history since start date for a specific user in given channels or all</p>
 
-<p>usage</p>
+<p>usage (1) using user id and channel ids</p>
 
-<p>ouput channel history of user (U00000000) in channels (C00000000 C11111111)</p>
+<p>output channel history of user (U00000000) in channels (C00000000 C11111111)</p>
 
 <p><code>
 shed get user-channel-history U00000000 C00000000 C11111111
 </code></p>
+
+<div class="w3-panel w3-dark-grey">
+  <p>Note that the above code may not return results as expected unless U00000000 and C00000000 C11111111, are valid member id and channel ids, respectfully.</p>
+</div>
+
+<p>usage (2) using user real name and channel names</p>
+
+<p>output channel history of user with real name "Joe Somebody" in "general" and "random" channel</p>
+
+<p><code>
+shed get user-channel-history-for-today "Joe\sSomebody" "general" "random"
+</code></p>
+
+<div class="w3-panel w3-dark-grey">
+  <p>Note that user real name and channel names are meant for exemplary purposes only.</p>
+</div>
 
 <hr />
 
@@ -92,7 +110,7 @@ shed get user-channel-history U00000000 C00000000 C11111111
 <p>set output format to text</p>
 
 <p><code>
-shed set ouput text
+shed set output text
 </code></p>
 
 <p>enable debug mode</p>
@@ -119,6 +137,10 @@ shed set debug false
 shed get user-id-by real-name 2b1t # U00000000
 </code></p>
 
+<div class="w3-panel w3-dark-grey">
+  <p>Note that the above code may not return results as expected unless 2b1t is a valid real-name associated with a user not necessarily U00000000.</p>
+</div>
+
 <hr />
 <!--.w3-container--></div>
 <!--.w3-card--></div>
@@ -129,6 +151,7 @@ shed get user-id-by real-name 2b1t # U00000000
 <div class="w3-bar w3-white">
 <a href="index.html" class="w3-bar-item w3-button w3-mobile">index</a>
 <a href="features.html" class="w3-bar-item w3-button w3-mobile">features</a>
+<a href="log.html" class="w3-bar-item w3-button w3-mobile">log</a>
 <a href="usage.html" class="w3-bar-item w3-button w3-mobile">usage</a>
 </div> 
 <!--.w3-container--></div>
