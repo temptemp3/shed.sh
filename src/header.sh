@@ -1,7 +1,6 @@
 #!/bin/bash
 ## header
-## =stub=
-## version 0.0.1 - initial
+## version 0.0.2 - post integration fix
 ##################################################
 test ${#} -eq 1 && {
  shed_source_path="${1}"
@@ -10,8 +9,8 @@ true
  shed_source_path=$( dirname ${0} )
 }
 . ${shed_source_path}/slack.sh/header.sh ${shed_source_path}/slack.sh
-. ${shed_source_path}/functions.sh
 . ${shed_source_path}/aliases.sh
+. ${shed_source_path}/functions.sh
 . ${shed_source_path}/functions-test.sh
 . ${shed_source_path}/functions-set.sh
 . ${shed_source_path}/functions-get.sh
