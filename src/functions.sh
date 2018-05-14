@@ -1,8 +1,31 @@
 #!/bin/bash
 ## functions
 ## - functions for shed
-## version 0.0.3 - env using test, payload
+## version 0.0.4 - post integration
 ##################################################
+test-message() { { local caller ; caller="${1}" ; local message ; message=${@:2} ; }
+ cat << EOF
+
+${message}
+
+EOF
+ ${caller}-help
+ error "false" # hide error
+ false
+}
+#-------------------------------------------------
+member-id-escaped() {
+  {
+    echo ${member_id}
+  } | sed-escape-member-id
+}
+#-------------------------------------------------
+test-member-id() { { local caller ; caller="${1}" ; local member_id ; member_id="${2}" ; }
+ test "${member_id}" || { test-message ${caller} "member id not specified" ; }
+ test "${member_id:0:1}" = "U" || { test-message ${caller} "member id invalid" ; }
+ # else ok
+}
+#-------------------------------------------------
 strip-double-quotes() {
   {
     echo ${@} \

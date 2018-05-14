@@ -1,8 +1,16 @@
 #!/bin/bash
 ## functions-test
 ## - test functions for shed
-## version 0.0.1 - initial
+## version 0.0.2 - post integration
 ##################################################
+slack-shed-test-get-channel-id-by-name() { { local candidate_value ; candidate_value=${@} ; }
+ get-channel-id-by-name ${candidate_value}
+}
+#-------------------------------------------------
+slack-shed-test-get-channel-id() { { local candidate_field ; candidate_field="${1}" ; local candidate_value ; candidate_value=${@:2} ; }
+ get-channel-id ${candidate_field} ${candidate_value} 
+}
+#-------------------------------------------------
 slack-shed-test-escape-slash() {
  escape-slash ${@}
 }
