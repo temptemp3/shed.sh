@@ -1,6 +1,6 @@
 #!/bin/bash
 ## testing
-## version 0.0.0 - empty
+## version 1.0.1 - using slack.sh/sh2 getops
 #################################################
 ##
 ## Use keyword arguments instead of positional 
@@ -11,9 +11,6 @@
 ## > shed get user-channel-history-for-today -u "Joe\sSomebody" -c general -c random
 ##
 ##-----------------------------------------------
-error "true"
-range() { ${SH2}/range.sh ${@} ; }
-. ${SH2}/getops.sh
 member_id=
 channel_ids=
 #-------------------------------------------------
